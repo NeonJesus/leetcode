@@ -65,5 +65,62 @@ return 1+(min(self.minDepth(root.left), self.minDepth(root.right)))
 
 None of the other conditions are met return the minimum of those 2 child nodes +1 . Straight forwared right? 
 
-But how does this calculate the depth?
+But how does this calculate the depth though? Let's take a look at the min and max functions:
 
+```
+return 1+(max(self.minDepth(root.left), self.minDepth(root.right)))
+...
+return 1+(min(self.minDepth(root.left), self.minDepth(root.right)))
+```
+
+Notice something? We're taking each of the nodes and sending them through the function we are already in! Why do that? Well the logic will be the same for processing every node, there isn't really a need for the nodes to be processed differently since they all fit the same criteria. You may also have looked at the code earlier and asked yourself, how are we tracking the node count as we go down? We aren't storing any variables. So let's just walk through it shall we?
+
+			  ->    3
+				   / \
+				  9  20
+				    /  \
+				   15   7
+
+So we start at 3. The root isn't None, so we don't return 0. Also, neither the left or right are none. So we go to the default which is the min + 1 of the left and right. But first we have to evaluate the left and right nodes by sending them through the minDepth function. So.....
+
+
+			        3
+				   / \
+		      ->  9  20
+				    /  \
+				   15   7
+
+If we look at node 9 we see that both the left and right are None. So we hit our second condition ( where at least left or right is None) and we take the max those two values. But since both of those legs are None, they return 0. So the max of 0 and 0 is 0. But wait, we return max + 1. So back at our original call at node 3 we have 1 + min(1, minDepth(20)). So now we gotta evaluate the other half of the tree to make sure there isn't a shorter path available right? 
+
+			        3
+				   / \
+				  9  20    <-
+				    /  \
+				   15   7
+
+So now we evaluate 20. Same deal as 3, both left and right are not none. So let's drop down again and we will evaluate from left to right.
+
+			        3
+				   / \
+				  9  20
+				    /  \
+			  ->   15   7
+
+Alright so 15 doesn't have any children, so they both return 0 and the max of that is 0 + 1. So at node 20 we are at 1 + min(1, minDepth(7)), let's evalutate 7. 
+
+
+			        3
+				   / \
+				  9  20
+				    /  \
+			       15   7  <-
+
+7 is the same as 15, no children. We end up returning 1. So back at node 20 we have 1 + min (1, 1) which gives us 1 + 1 meaning we return 2 to the waiting min call at node 3. Hang in there, we're almost done!
+
+			  ->    3
+				   / \
+				  9  20
+				    /  \
+				   15   7
+
+Now we're back where we started with 1 + min(1,2) which resolves to 1 + 1 meaning we return 2. Which, for this example means we've returned the correct answer! If you're still having trouble following along, I recommend drawing it out on a piece of paper or whiteboard. That helped us work through this a ton. Good luck with your own implementation! 
